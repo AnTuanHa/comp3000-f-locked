@@ -10,6 +10,7 @@
 
 int check_group(const char *path);
 int get_perm(const char *path);
+int set_perm(const char *path, int value);
 
 #endif
 

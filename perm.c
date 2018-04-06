@@ -22,3 +22,11 @@ int get_perm(const char* path)
 
     return file.st_mode;
 }
+
+int set_perm(const char * path, int value)
+{
+    int i;
+    i = chmod(path, value);
+
+    return i;
+}
