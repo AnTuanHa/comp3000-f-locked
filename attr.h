@@ -9,5 +9,6 @@
 
 int attr_exists(const char *path, const char *name);
 int setattr(const char *path, const char *name, const char *value);
+char* getattr(const char *path, const char *name);
 
 #endif
