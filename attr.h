@@ -7,6 +7,7 @@
 
 #define KEY_SIZE 64
 
+int attr_exists(const char *path, const char *name);
 int setattr(const char *path, const char *name, const char *value);
 
 #endif
