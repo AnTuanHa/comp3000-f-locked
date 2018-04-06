@@ -68,10 +68,16 @@ int lock_file(const char *path)
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
         return -1;
     }
-    if (setattr(path, KEY_PERM, get_perm(path) < 0) {
+
+    char perms[7];
+    sprintf(perms, "%d", get_perm(path));
+
+    if (setattr(path, KEY_PERM,  perms) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PERM, path);
         return -1;
     }
+
+    
 
     free(plain_block);
     free(cipher_block);
