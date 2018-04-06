@@ -72,12 +72,15 @@ int lock_file(const char *path)
     char perms[7];
     sprintf(perms, "%d", get_perm(path));
 
-    if (setattr(path, KEY_PERM,  perms) < 0) {
+    if (setattr(path, KEY_PERM, perms) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PERM, path);
         return -1;
     }
 
-    
+    if (set_perm(path, 0000) < 0) {
+        printf("Failed to change permissions on %s\n", path);
+        return -1;
+    }
 
     free(plain_block);
     free(cipher_block);
