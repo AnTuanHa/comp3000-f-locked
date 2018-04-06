@@ -57,11 +57,11 @@ int lock_file(const char *path)
     blocks_to_string(cipher_block, cipher);
 
     if (setattr(path, KEY_CIPHERTEXT, cipher) < 0) {
-        printf("Failed to set extended attribute 'security.%s' on %s\n", KEY_CIPHERTEXT, path);
+        printf("Failed to set extended attribute '%s' on %s\n", SECURITY_CIPHERTEXT, path);
         return -1;
     }
     if (setattr(path, KEY_PLAINTEXT, plain) < 0) {
-        printf("Failed to set extended attribute 'security.%s' on %s\n", KEY_PLAINTEXT, path);
+        printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
         return -1;
     }
 
