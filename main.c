@@ -5,6 +5,8 @@
 #include "cipher.h"
 #include "perm.h"
 
+#define MAX_SIZE 1024
+
 #define SECURITY_CIPHERTEXT "security.ciphertext"
 #define SECURITY_PLAINTEXT "security.plaintext"
 #define SECURITY_PERM "security.permissions"
@@ -89,6 +91,66 @@ int lock_file(const char *path)
 
 int unlock_file(const char *path)
 {
-    //TODO: Implement unlock
+    Blocks* plain_block;
+    Blocks* cipher_block;
+    Blocks* plain_dec_block = malloc(sizeof(Blocks));
+
+    char cipher[MAX_SIZE];
+    if (getxattr(path, SECURITY_CIPHERTEXT, cipher, MAX_SIZE - 1) < 0) {
+        printf("Failed to get extended attribute '%s' on %s\n", SECURITY_CIPHERTEXT, path);
+        return -1;
+    }
+    cipher_block = string_to_blocks(cipher);
+
+    char plain[MAX_SIZE];
+    if (getxattr(path, SECURITY_PLAINTEXT, plain, MAX_SIZE - 1) < 0) {
+        printf("Failed to get extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
+        return -1;
+    }
+    plain_block = string_to_blocks(plain);
+
+    unsigned char pwd[SIZE * 4];
+    printf("Enter your password to unlock: ");
+    scanf("%s", pwd);
+
+    decrypt(pwd, cipher_block, plain_dec_block);
+
+    // Password is correct
+    if (is_valid(plain_block, plain_dec_block) == 0) {
+        printf("Unlocking file...\n");
+
+        char perm[MAX_SIZE];
+        if (getxattr(path, SECURITY_PERM, perm, MAX_SIZE - 1) < 0) {
+            printf("Failed to get extended attribute '%s' on %s\n", SECURITY_PERM, path);
+            return -1;
+        }
+
+        int p = (int)strtol(perm, (char **)NULL, 10);
+        if (set_perm(path, p) < 0) {
+            printf("Failed to change permissions on %s\n", path);
+            return -1;
+        }
+
+        if (removexattr(path, SECURITY_CIPHERTEXT) < 0) {
+            printf("Failed to remove extended attribute '%s' on %s\n", SECURITY_CIPHERTEXT, path);
+            return -1;
+        }
+        if (removexattr(path, SECURITY_PLAINTEXT) < 0) {
+            printf("Failed to remove extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
+            return -1;
+        }
+        if (removexattr(path, SECURITY_PERM) < 0) {
+            printf("Failed to remove extended attribute '%s' on %s\n", SECURITY_PERM, path);
+            return -1;
+        }
+
+        printf("Success\n");
+    } else {
+        printf("Wrong password\n");
+    }
+
+    free(plain_block);
+    free(cipher_block);
+    free(plain_dec_block);
     return 0;
 }
