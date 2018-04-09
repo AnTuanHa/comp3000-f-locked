@@ -3,11 +3,14 @@
 
 #include "attr.h"
 #include "cipher.h"
+#include "perm.h"
 
 #define SECURITY_CIPHERTEXT "security.ciphertext"
 #define SECURITY_PLAINTEXT "security.plaintext"
+#define SECURITY_PERM "security.permissions"
 #define KEY_CIPHERTEXT "ciphertext"
 #define KEY_PLAINTEXT "plaintext"
+#define KEY_PERM "permissions"
 
 int lock_file(const char *path);
 int unlock_file(const char *path);
@@ -26,7 +29,8 @@ int main(int argc, char *argv[])
 
     // Lock does not exist
     if (!attr_exists(argv[1], SECURITY_CIPHERTEXT) &&
-            !attr_exists(argv[1], SECURITY_PLAINTEXT)) {
+            !attr_exists(argv[1], SECURITY_PLAINTEXT) &&
+            check_group(argv[1])) {
         if (lock_file(argv[1])) {
             printf("Failed to lock file '%s'\n", argv[1]);
             return -1;
@@ -62,6 +66,19 @@ int lock_file(const char *path)
     }
     if (setattr(path, KEY_PLAINTEXT, plain) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
+        return -1;
+    }
+
+    char perms[7];
+    sprintf(perms, "%d", get_perm(path));
+
+    if (setattr(path, KEY_PERM, perms) < 0) {
+        printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PERM, path);
+        return -1;
+    }
+
+    if (set_perm(path, 0000) < 0) {
+        printf("Failed to change permissions on %s\n", path);
         return -1;
     }
 
