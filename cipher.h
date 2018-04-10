@@ -15,8 +15,8 @@ typedef struct{
 } Blocks;
 
 void gen_rdm(Blocks* b);
-Blocks* encrypt(unsigned char* pwd, Blocks* pt, Blocks* ct);
-Blocks* decrypt(unsigned char* pwd, Blocks* ct, Blocks* pt);
+void encrypt(char* pwd, Blocks* pt, Blocks* ct);
+void decrypt(char* pwd, Blocks* ct, Blocks* pt);
 int is_valid(Blocks* plain, Blocks* plain_dec);
 void blocks_to_string(Blocks* b, char* s);
 Blocks* string_to_blocks(char* s);
