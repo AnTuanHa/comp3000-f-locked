@@ -1,5 +1,4 @@
 #include "cipher.h"
-#include <stdio.h>
 /*****
 DISCLAIMER
 
@@ -17,10 +16,10 @@ void gen_rdm(Blocks* b){
 	srand((unsigned int) time(NULL));
 	size_t i;
 	for(i=0; i<SIZE; i++){
-		b->b1[i] = rand();
-		b->b2[i] = rand();
-		b->b3[i] = rand();
-		b->b4[i] = rand();
+		b->b1[i] = (rand()%254+1);
+		b->b2[i] = (rand()%254+1);
+		b->b3[i] = (rand()%254+1);
+		b->b4[i] = (rand()%254+1);
 	}
 }
 
@@ -32,16 +31,20 @@ void encrypt(char * pwd, Blocks* pt, Blocks* ct){
       pwd_i = 0;
     }
     if(i<8){
-      ct->b1[i] = (unsigned char)(pt->b1[i] + (unsigned char)pwd[pwd_i]);
+			unsigned char b1 = ((pt->b1[i] + (unsigned char)pwd[pwd_i])+255%255+1);
+			ct->b1[i] = b1;
     }
     if(i>=8 && i<16){
-      ct->b2[i-8] = (unsigned char)(pt->b2[i-8] + (unsigned char)pwd[pwd_i]);
+			unsigned char b2 = ((pt->b2[i-8] + (unsigned char)pwd[pwd_i])+255%255+1);
+			ct->b2[i-8] = b2;
     }
     if(i>=16 && i<24){
-      ct->b3[i-16] = (unsigned char)(pt->b3[i-16] + (unsigned char)pwd[pwd_i]);
+			unsigned char b3 = ((pt->b3[i-16] + (unsigned char)pwd[pwd_i])+255%255+1);
+			ct->b3[i-16] = b3;
     }
     if(i>=24 && i<32){
-      ct->b4[i-24] = (unsigned char)(pt->b4[i-24] + (unsigned char)pwd[pwd_i]);
+			unsigned char b4 = ((pt->b4[i-24] + (unsigned char)pwd[pwd_i])+255%255+1);
+			ct->b4[i-24] = b4;
     }
     pwd_i++;
   }
@@ -55,16 +58,20 @@ void decrypt(char* pwd, Blocks* ct, Blocks* pt){
       pwd_i = 0;
     }
     if(i<8){
-      pt->b1[i] = (unsigned char)(ct->b1[i] - (unsigned char)pwd[pwd_i]);
+			unsigned char b1 = ((ct->b1[i] - (unsigned char)pwd[pwd_i])+255%255-1%255);
+			pt->b1[i] = b1;
     }
     if(i>=8 && i<16){
-      pt->b2[i-8] = (unsigned char)(ct->b2[i-8] - (unsigned char)pwd[pwd_i]);
+			unsigned char b2 = ((ct->b2[i-8] - (unsigned char)pwd[pwd_i])+255%255-1%255);
+      pt->b2[i-8] = b2;
     }
     if(i>=16 && i<24){
-      pt->b3[i-16] = (unsigned char)(ct->b3[i-16] - (unsigned char)pwd[pwd_i]);
+			unsigned char b3 = ((ct->b3[i-16] - (unsigned char)pwd[pwd_i])+255%255-1%255);
+      pt->b3[i-16] = b3;
     }
     if(i>=24 && i<32){
-      pt->b4[i-24] = (unsigned char)(ct->b4[i-24] - (unsigned char)pwd[pwd_i]);
+			unsigned char b4 = ((ct->b4[i-24] - (unsigned char)pwd[pwd_i])+255%255-1%255);
+      pt->b4[i-24] = b4;
     }
     pwd_i++;
   }
@@ -81,7 +88,7 @@ int is_valid(Blocks* plain, Blocks* plain_dec){
     (plain->b3[i] != plain_dec->b3[i])||
     (plain->b4[i] != plain_dec->b4[i])
   ){
-      isvalid = -1;
+			isvalid = -1;
       break;
     }
   }
