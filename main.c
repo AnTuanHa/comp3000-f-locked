@@ -31,11 +31,13 @@ int main(int argc, char *argv[])
 
     // Lock does not exist
     if (!attr_exists(argv[1], SECURITY_CIPHERTEXT) &&
-            !attr_exists(argv[1], SECURITY_PLAINTEXT) &&
-            check_group(argv[1])) {
-        if (lock_file(argv[1])) {
-            printf("Failed to lock file '%s'\n", argv[1]);
-            return -1;
+            !attr_exists(argv[1], SECURITY_PLAINTEXT)) {
+        // Ensure that the file the user is locking is owned by the user
+        if (check_group(argv[1])) {
+            if (lock_file(argv[1])) {
+                printf("Failed to lock file '%s'\n", argv[1]);
+                return -1;
+            }
         }
     } else {
         if (unlock_file(argv[1])) {
