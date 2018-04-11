@@ -64,6 +64,14 @@ int lock_file(const char *path)
     blocks_to_string(plain_block, plain);
     blocks_to_string(cipher_block, cipher);
 
+    char perms[7];
+    sprintf(perms, "%d", get_perm(path));
+
+    if (set_perm(path, 0000) < 0) {
+        printf("Failed to change permissions on %s\n", path);
+        return -1;
+    }
+
     if (setattr(path, KEY_CIPHERTEXT, cipher) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_CIPHERTEXT, path);
         return -1;
@@ -72,17 +80,8 @@ int lock_file(const char *path)
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
         return -1;
     }
-
-    char perms[7];
-    sprintf(perms, "%d", get_perm(path));
-
     if (setattr(path, KEY_PERM, perms) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PERM, path);
-        return -1;
-    }
-
-    if (set_perm(path, 0000) < 0) {
-        printf("Failed to change permissions on %s\n", path);
         return -1;
     }
 
@@ -126,12 +125,7 @@ int unlock_file(const char *path)
             printf("Failed to get extended attribute '%s' on %s\n", SECURITY_PERM, path);
             return -1;
         }
-
         int p = (int)strtol(perm, (char **)NULL, 10);
-        if (set_perm(path, p) < 0) {
-            printf("Failed to change permissions on %s\n", path);
-            return -1;
-        }
 
         if (removexattr(path, SECURITY_CIPHERTEXT) < 0) {
             printf("Failed to remove extended attribute '%s' on %s\n", SECURITY_CIPHERTEXT, path);
@@ -143,6 +137,11 @@ int unlock_file(const char *path)
         }
         if (removexattr(path, SECURITY_PERM) < 0) {
             printf("Failed to remove extended attribute '%s' on %s\n", SECURITY_PERM, path);
+            return -1;
+        }
+
+        if (set_perm(path, p) < 0) {
+            printf("Failed to change permissions on %s\n", path);
             return -1;
         }
 
