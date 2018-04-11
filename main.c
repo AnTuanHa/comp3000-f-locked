@@ -85,6 +85,8 @@ int lock_file(const char *path)
         return -1;
     }
 
+    printf("File successfully locked with the given password\n");
+
     free(plain_block);
     free(cipher_block);
     return 0;
