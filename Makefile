@@ -7,7 +7,7 @@ $(PROG_NAME): main.o attr.o cipher.o perm.o
 	@echo "which is required for setting extended attributes under the 'security' namespace"
 	@echo -e "************"
 
-main.o: main.c attr.h cipher.h
+main.o: main.c attr.h cipher.h perm.h
 	gcc -c main.c
 
 attr.o: attr.c attr.h
