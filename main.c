@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
     }
 
     // Ensure that the file the user is locking is owned by the user
-    if (check_group(argv[1])) {
+    if (!check_group(argv[1])) {
         printf("File '%s' is not owned by current user!\n", argv[1]);
         printf("Aborting file locking\n");
         return -1;
