@@ -1,5 +1,5 @@
 #include "cipher.h"
-#include <stdio.h>
+
 /*****
 DISCLAIMER
 
