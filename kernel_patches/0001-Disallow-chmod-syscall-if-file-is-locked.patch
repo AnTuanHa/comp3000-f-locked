@@ -1,0 +1,63 @@
+From 2fbc93135f8d52084b11bfb512a6834b6cfe8767 Mon Sep 17 00:00:00 2001
+From: An Ha <zero579911@gmail.com>
+Date: Wed, 11 Apr 2018 13:33:41 -0400
+Subject: [PATCH] Disallow chmod syscall if file is locked
+
+If the file is locked, ie. has the 'security.ciphertext',
+'security.plaintext', or 'security.permissions' extended attributes
+set, then we disallow the chmod syscall from proceeding, as we do not
+want users to change the permissions of a file that has been locked by
+our program, flock.
+---
+ fs/open.c | 30 ++++++++++++++++++++++++++++++
+ 1 file changed, 30 insertions(+)
+
+diff --git a/fs/open.c b/fs/open.c
+index fbc5c7b2..db7b0464 100644
+--- a/fs/open.c
++++ b/fs/open.c
+@@ -501,11 +501,41 @@ out:
+ 
+ static int chmod_common(struct path *path, umode_t mode)
+ {
++	struct dentry *dentry = path->dentry;
+ 	struct inode *inode = path->dentry->d_inode;
+ 	struct inode *delegated_inode = NULL;
+ 	struct iattr newattrs;
+ 	int error;
+ 
++	if (inode->i_op->getxattr) {
++		error = inode->i_op->getxattr(dentry, "security.ciphertext", NULL, 0);
++		if (error > 0) {
++			printk(KERN_INFO "File is locked! Aborting chmod");
++			goto out_unlock;
++		} else if (error == -1) {
++			printk(KERN_INFO "Error calling syscall getxattr");
++			goto out_unlock;
++		}
++
++		error = inode->i_op->getxattr(dentry, "security.plaintext", NULL, 0);
++		if (error > 0) {
++			printk(KERN_INFO "File is locked! Aborting chmod");
++			goto out_unlock;
++		} else if (error == -1) {
++			printk(KERN_INFO "Error calling syscall getxattr");
++			goto out_unlock;
++		}
++
++		error = inode->i_op->getxattr(dentry, "security.permissions", NULL, 0);
++		if (error > 0) {
++			printk(KERN_INFO "File is locked! Aborting chmod");
++			goto out_unlock;
++		} else if (error == -1) {
++			printk(KERN_INFO "Error calling syscall getxattr");
++			goto out_unlock;
++		}
++	}
++
+ 	error = mnt_want_write(path->mnt);
+ 	if (error)
+ 		return error;
+-- 
+2.16.2
+

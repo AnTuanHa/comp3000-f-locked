@@ -13,6 +13,32 @@ $ make
 $ sudo make install
 ```
 
+Note, the `flocked` program must be run on a patched Linux Kernel, as we must
+modify the `chmod` syscall so that the user cannot change the permissions of a
+locked file. F-locked has been built and tested upon the linux kernel version
+4.4.121, but newer versions will still work. The linux kernel installation
+process may be different depending on the linux distribution that the user is
+using, but applying the patch should not differ.
+
+```bash
+$ wget https://cdn.kernel.org/pub/linux/kernel/v4.x/linux-4.4.121.tar.xz
+$ tar xvf linux-4.4.121.tar.xz
+$ cd linux-4.4.121
+$ patch -p1 < ../kernel_patches/*.patch
+patching file fs/open.c
+```
+
+Alternatively, one can clone the linux kernel git repository that we have built
+upon and install the modified linux kernel from there.
+
+```bash
+$ git clone https://github.com/zero57/linux-stable-v4.4.121
+```
+
+Once the patch has been applied or the Linux kernel git repository has been
+cloned, follow your Linux distribution's instructions on installing a custom
+Linux kernel.
+
 # Example
 ```bash
 $ mkdir /tmp/test
