@@ -8,6 +8,7 @@ set, the user may call the program again to unlock it with the set password.
 # How to build and install
 ```bash
 $ git clone https://github.com/zero57/comp3000-f-locked
+$ cd comp3000-f-locked
 $ make
 $ sudo make install
 ```
