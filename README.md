@@ -55,6 +55,9 @@ $ ls -l myfile
 ---------- 1 MYUSER MYUSER 0 Apr 12 18:19 myfile
 $ cat myfile
 cat: myfile: Permission denied
+$ chmod 0666 myfile
+$ ls -l myfile
+---------- 1 MYUSER MYUSER 0 Apr 12 18:20 myfile
 $ flocked myfile
 Enter your password to unlock: mypassword
 Unlocking file...
