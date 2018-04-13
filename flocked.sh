@@ -2,12 +2,13 @@
 
 ESTDERR=$((256 - 1))
 EWRONG_PASSWORD=$((256 - 2))
-EFILE_NOT_EXISTS=$((256 - 3))
-EFILE_NOT_OWNED_BY_USER=$((256 - 4))
-EFILE_CHANGE_PERMISSIONS=$((256 - 5))
-EFILE_SET_XATTR=$((256 - 6))
-EFILE_GET_XATTR=$((256 - 7))
-EFILE_RM_XATTR=$((256 - 8))
+EEMPTY_PASSWORD=$((256 - 3))
+EFILE_NOT_EXISTS=$((256 - 4))
+EFILE_NOT_OWNED_BY_USER=$((256 - 5))
+EFILE_CHANGE_PERMISSIONS=$((256 - 6))
+EFILE_SET_XATTR=$((256 - 7))
+EFILE_GET_XATTR=$((256 - 8))
+EFILE_RM_XATTR=$((256 - 9))
 
 zenity --password --title="Flock" --text="Please enter your password" | flocked $1
 ERROR=$?
@@ -18,6 +19,9 @@ ${ESTDERR})
 	;;
 ${EWRONG_PASSWORD})
 	zenity --error --text="Wrong password.\nFailed to unlock file '$1'."
+	;;
+${EEMPTY_PASSWORD})
+	zenity --error --text="Empty password given.\nAborting file locking."
 	;;
 ${EFILE_NOT_EXISTS})
 	zenity --error --text="File '$1' does not exist."

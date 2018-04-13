@@ -16,12 +16,13 @@
 
 #define ESTDERR -1
 #define EWRONG_PASSWORD -2
-#define EFILE_NOT_EXISTS -3
-#define EFILE_NOT_OWNED_BY_USER -4
-#define EFILE_CHANGE_PERMISSIONS -5
-#define EFILE_SET_XATTR -6
-#define EFILE_GET_XATTR -7
-#define EFILE_RM_XATTR -8
+#define EEMPTY_PASSWORD -3
+#define EFILE_NOT_EXISTS -4
+#define EFILE_NOT_OWNED_BY_USER -5
+#define EFILE_CHANGE_PERMISSIONS -6
+#define EFILE_SET_XATTR -7
+#define EFILE_GET_XATTR -8
+#define EFILE_RM_XATTR -9
 
 int lock_file(const char *path);
 int unlock_file(const char *path);
@@ -66,10 +67,15 @@ int lock_file(const char *path)
 {
     Blocks *plain_block = malloc(sizeof(Blocks));
     Blocks *cipher_block = malloc(sizeof(Blocks));
-    unsigned char pwd[SIZE * 4];
+    char pwd[SIZE * 4];
     printf("Enter your password: ");
-    scanf("%s", pwd);
+    fgets(pwd, sizeof(pwd), stdin);
     gen_rdm(plain_block);
+
+    if (pwd[0] == '\n' || pwd[0] == '\0') {
+        printf("Empty password given, aborting file locking\n", path);
+        return EEMPTY_PASSWORD;
+    }
 
     encrypt(pwd, plain_block, cipher_block);
     char plain[SIZE * 4];
@@ -125,9 +131,9 @@ int unlock_file(const char *path)
     }
     plain_block = string_to_blocks(plain);
 
-    unsigned char pwd[SIZE * 4];
+    char pwd[SIZE * 4];
     printf("Enter your password to unlock: ");
-    scanf("%s", pwd);
+    fgets(pwd, sizeof(pwd), stdin);
 
     decrypt(pwd, cipher_block, plain_dec_block);
 
