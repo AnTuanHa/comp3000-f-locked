@@ -25,3 +25,4 @@ clean:
 install:
 	cp ./$(PROG_NAME) /usr/local/bin
 	setcap cap_sys_admin+ep /usr/local/bin/$(PROG_NAME)
+	cp ./flocked.sh /usr/local/bin
