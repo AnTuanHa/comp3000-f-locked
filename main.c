@@ -5,6 +5,8 @@
 #include "cipher.h"
 #include "perm.h"
 
+#define MAX_SIZE 1024
+
 #define SECURITY_CIPHERTEXT "security.ciphertext"
 #define SECURITY_PLAINTEXT "security.plaintext"
 #define SECURITY_PERM "security.permissions"
@@ -65,7 +67,7 @@ int lock_file(const char *path)
 {
     Blocks *plain_block = malloc(sizeof(Blocks));
     Blocks *cipher_block = malloc(sizeof(Blocks));
-    char pwd[SIZE * 4];
+    char pwd[MAX_SIZE];
     printf("Enter your password: ");
     fgets(pwd, sizeof(pwd), stdin);
     gen_rdm(plain_block);
@@ -129,7 +131,7 @@ int unlock_file(const char *path)
     }
     plain_block = binary_to_blocks(plain);
 
-    char pwd[SIZE * 4];
+    char pwd[MAX_SIZE];
     printf("Enter your password to unlock: ");
     fgets(pwd, sizeof(pwd), stdin);
 
