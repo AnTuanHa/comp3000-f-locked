@@ -76,7 +76,6 @@ int lock_file(const char *path)
     }
 
     encrypt(pwd, plain_block, cipher_block);
-    size_t size = sizeof(unsigned int) * SIZE * 4;
     unsigned int plain[SIZE * 4];
     unsigned int cipher[SIZE * 4];
     blocks_to_binary(plain_block, plain);
@@ -90,11 +89,11 @@ int lock_file(const char *path)
         return EFILE_CHANGE_PERMISSIONS;
     }
 
-    if (setattr(path, KEY_CIPHERTEXT, cipher, size) < 0) {
+    if (setattr(path, KEY_CIPHERTEXT, cipher, sizeof(cipher)) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_CIPHERTEXT, path);
         return EFILE_SET_XATTR;
     }
-    if (setattr(path, KEY_PLAINTEXT, plain, size) < 0) {
+    if (setattr(path, KEY_PLAINTEXT, plain, sizeof(plain)) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
         return EFILE_SET_XATTR;
     }
