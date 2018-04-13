@@ -5,8 +5,6 @@
 #include "cipher.h"
 #include "perm.h"
 
-#define MAX_SIZE 1024
-
 #define SECURITY_CIPHERTEXT "security.ciphertext"
 #define SECURITY_PLAINTEXT "security.plaintext"
 #define SECURITY_PERM "security.permissions"
@@ -78,10 +76,11 @@ int lock_file(const char *path)
     }
 
     encrypt(pwd, plain_block, cipher_block);
-    char plain[SIZE * 4];
-    char cipher[SIZE * 4];
-    blocks_to_string(plain_block, plain);
-    blocks_to_string(cipher_block, cipher);
+    size_t size = sizeof(unsigned int) * SIZE * 4;
+    unsigned int plain[SIZE * 4];
+    unsigned int cipher[SIZE * 4];
+    blocks_to_binary(plain_block, plain);
+    blocks_to_binary(cipher_block, cipher);
 
     char perms[7];
     sprintf(perms, "%d", get_perm(path));
@@ -91,15 +90,15 @@ int lock_file(const char *path)
         return EFILE_CHANGE_PERMISSIONS;
     }
 
-    if (setattr(path, KEY_CIPHERTEXT, cipher) < 0) {
+    if (setattr(path, KEY_CIPHERTEXT, cipher, size) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_CIPHERTEXT, path);
         return EFILE_SET_XATTR;
     }
-    if (setattr(path, KEY_PLAINTEXT, plain) < 0) {
+    if (setattr(path, KEY_PLAINTEXT, plain, size) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
         return EFILE_SET_XATTR;
     }
-    if (setattr(path, KEY_PERM, perms) < 0) {
+    if (setattr(path, KEY_PERM, perms, sizeof(perms)) < 0) {
         printf("Failed to set extended attribute '%s' on %s\n", SECURITY_PERM, path);
         return EFILE_SET_XATTR;
     }
@@ -117,19 +116,19 @@ int unlock_file(const char *path)
     Blocks* cipher_block;
     Blocks* plain_dec_block = malloc(sizeof(Blocks));
 
-    char cipher[MAX_SIZE];
-    if (getxattr(path, SECURITY_CIPHERTEXT, cipher, MAX_SIZE - 1) < 0) {
+    unsigned int cipher[SIZE * 4];
+    if (getxattr(path, SECURITY_CIPHERTEXT, cipher, sizeof(cipher)) < 0) {
         printf("Failed to get extended attribute '%s' on %s\n", SECURITY_CIPHERTEXT, path);
         return EFILE_GET_XATTR;
     }
-    cipher_block = string_to_blocks(cipher);
+    cipher_block = binary_to_blocks(cipher);
 
-    char plain[MAX_SIZE];
-    if (getxattr(path, SECURITY_PLAINTEXT, plain, MAX_SIZE - 1) < 0) {
+    unsigned int plain[SIZE * 4];
+    if (getxattr(path, SECURITY_PLAINTEXT, plain, sizeof(plain)) < 0) {
         printf("Failed to get extended attribute '%s' on %s\n", SECURITY_PLAINTEXT, path);
         return EFILE_GET_XATTR;
     }
-    plain_block = string_to_blocks(plain);
+    plain_block = binary_to_blocks(plain);
 
     char pwd[SIZE * 4];
     printf("Enter your password to unlock: ");
@@ -141,8 +140,8 @@ int unlock_file(const char *path)
     if (is_valid(plain_block, plain_dec_block) == 0) {
         printf("Unlocking file...\n");
 
-        char perm[MAX_SIZE];
-        if (getxattr(path, SECURITY_PERM, perm, MAX_SIZE - 1) < 0) {
+        char perm[7];
+        if (getxattr(path, SECURITY_PERM, perm, sizeof(perm)) < 0) {
             printf("Failed to get extended attribute '%s' on %s\n", SECURITY_PERM, path);
             return EFILE_GET_XATTR;
         }

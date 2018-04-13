@@ -8,17 +8,17 @@
 #define SIZE 8
 
 typedef struct{
-  unsigned char b1[SIZE];
-  unsigned char b2[SIZE];
-  unsigned char b3[SIZE];
-  unsigned char b4[SIZE];
+    unsigned int b1[SIZE];
+    unsigned int b2[SIZE];
+    unsigned int b3[SIZE];
+    unsigned int b4[SIZE];
 } Blocks;
 
 void gen_rdm(Blocks* b);
 void encrypt(char* pwd, Blocks* pt, Blocks* ct);
 void decrypt(char* pwd, Blocks* ct, Blocks* pt);
 int is_valid(Blocks* plain, Blocks* plain_dec);
-void blocks_to_string(Blocks* b, char* s);
-Blocks* string_to_blocks(char* s);
+void blocks_to_binary(Blocks* b, unsigned int* s);
+Blocks* binary_to_blocks(unsigned int* s);
 
 #endif
