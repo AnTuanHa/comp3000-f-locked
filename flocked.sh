@@ -9,6 +9,8 @@ EFILE_CHANGE_PERMISSIONS=$((256 - 6))
 EFILE_SET_XATTR=$((256 - 7))
 EFILE_GET_XATTR=$((256 - 8))
 EFILE_RM_XATTR=$((256 - 9))
+FILE_LOCKED=1
+FILE_UNLOCKED=2
 
 zenity --password --title="F-Locked" --text="Please enter your password" | flocked $1
 ERROR=$?
@@ -40,5 +42,11 @@ ${EFILE_GET_XATTR})
 	;;
 ${EFILE_RM_XATTR})
 	zenity --error --text="Failed to remove extended attributes on '$1'"
+	;;
+${FILE_LOCKED})
+	zenity --info --title="F-Locked" --text="File successfully locked"
+	;;
+${FILE_UNLOCKED})
+	zenity --info --title="F-Locked" --text="File successfully unlocked"
 	;;
 esac

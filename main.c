@@ -23,6 +23,8 @@
 #define EFILE_SET_XATTR -7
 #define EFILE_GET_XATTR -8
 #define EFILE_RM_XATTR -9
+#define FILE_LOCKED 1
+#define FILE_UNLOCKED 2
 
 int lock_file(const char *path);
 int unlock_file(const char *path);
@@ -108,7 +110,7 @@ int lock_file(const char *path)
 
     free(plain_block);
     free(cipher_block);
-    return 0;
+    return FILE_LOCKED;
 }
 
 int unlock_file(const char *path)
@@ -175,5 +177,5 @@ int unlock_file(const char *path)
     free(plain_block);
     free(cipher_block);
     free(plain_dec_block);
-    return 0;
+    return FILE_UNLOCKED;
 }
