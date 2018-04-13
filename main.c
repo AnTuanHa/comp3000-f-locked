@@ -54,11 +54,11 @@ int main(int argc, char *argv[])
     if (!attr_exists(argv[1], SECURITY_CIPHERTEXT) &&
             !attr_exists(argv[1], SECURITY_PLAINTEXT)) {
         ret = lock_file(argv[1]);
-        if (ret)
+        if (ret != FILE_LOCKED)
             printf("Failed to lock file '%s'\n", argv[1]);
     } else {
         ret = unlock_file(argv[1]);
-        if (ret)
+        if (ret != FILE_UNLOCKED)
             printf("Failed to unlock file '%s'\n", argv[1]);
     }
 
