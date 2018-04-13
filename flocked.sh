@@ -10,12 +10,12 @@ EFILE_SET_XATTR=$((256 - 7))
 EFILE_GET_XATTR=$((256 - 8))
 EFILE_RM_XATTR=$((256 - 9))
 
-zenity --password --title="Flock" --text="Please enter your password" | flocked $1
+zenity --password --title="F-Locked" --text="Please enter your password" | flocked $1
 ERROR=$?
 
 case ${ERROR} in
 ${ESTDERR})
-	zenity --error --text="Failed to run flocked."
+	zenity --error --text="Failed to run F-Locked."
 	;;
 ${EWRONG_PASSWORD})
 	zenity --error --text="Wrong password.\nFailed to unlock file '$1'."
