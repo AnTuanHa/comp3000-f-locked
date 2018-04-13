@@ -73,7 +73,7 @@ int lock_file(const char *path)
     gen_rdm(plain_block);
 
     if (pwd[0] == '\n' || pwd[0] == '\0') {
-        printf("Empty password given, aborting file locking\n", path);
+        printf("Empty password given, aborting file locking\n");
         return EEMPTY_PASSWORD;
     }
 
