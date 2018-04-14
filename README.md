@@ -67,3 +67,18 @@ $ ls -l myfile
 $ cat myfile
 hello world
 ```
+# Configuring the custom action 
+
+To set up the custom action in the file manager, click the "Edit" tab, and select "Configure custom actions..."
+Add a new custom action titled "F-Locked" with the following command. 
+```
+/usr/local/bin/flocked.sh %f
+```
+Under the "Appearance Condtions" tab, check every box. 
+
+# Software used
+
+This program was made and tested in the COMP2404-2406-W18 Virtual Machine found on:
+https://carleton.ca/scs/technical-support/virtual-machines/
+
+The custom action was added using the file manager, "Thunar" version 1.6.11.
